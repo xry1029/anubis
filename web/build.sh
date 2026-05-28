@@ -54,3 +54,5 @@ for file in js/**/*.ts js/**/*.mjs; do
   zstd -f -k --ultra -22 "$out"
   brotli -fZk "$out"
 done
+# no sourcemap!
+rm static/js/*.map static/js/*/*.map
