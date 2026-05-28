@@ -1,7 +1,14 @@
 $`npm run assets`;
 
-["amd64", "arm64", "ppc64le", "riscv64"].forEach((goarch) => {
-  [deb, rpm, tarball].forEach((method) =>
+[
+"386",
+"amd64",
+"arm",
+"arm64",
+"mips",
+"mipsle"
+].forEach((goarch) => {
+  [tarball].forEach((method) =>
     method.build({
       name: "anubis",
       description:
@@ -17,9 +24,13 @@ $`npm run assets`;
       },
 
       build: ({ bin, etc, systemd, doc }) => {
-        $`go build -o ${bin}/anubis -ldflags '-s -w -extldflags "-static" -X "github.com/TecharoHQ/anubis.Version=${git.tag()}"' ./cmd/anubis`;
-        $`go build -o ${bin}/anubis-robots2policy -ldflags '-s -w -extldflags "-static" -X "github.com/TecharoHQ/anubis.Version=${git.tag()}"' ./cmd/robots2policy`;
-
+        if (goarch == "arm") {
+                $`GOARM=7 go build -o ${bin}/anubis -ldflags '-s -w -extldflags "-static"' ./cmd/anubis`;
+                $`GOARM=7 go build -o ${bin}/anubis-robots2policy -ldflags '-s -w -extldflags "-static"' ./cmd/robots2policy`;
+            } else {
+                $`go build -o ${bin}/anubis -ldflags '-s -w -extldflags "-static"' ./cmd/anubis`;
+                $`go build -o ${bin}/anubis-robots2policy -ldflags '-s -w -extldflags "-static"' ./cmd/robots2policy`;
+        };
         file.install("./run/anubis@.service", `${systemd}/anubis@.service`);
         file.install("./run/default.env", `${etc}/default.env`);
 
